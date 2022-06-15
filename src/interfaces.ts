@@ -6,7 +6,10 @@ export interface Person {
 }
 
 export interface Answer {
-  status: string;
-  message?: string;
-  data?: Person | Person[]; 
+  status: number;
+  body: string | Person | Person[] | null; 
+}
+
+export interface Method {
+  (id: string): Answer
 }

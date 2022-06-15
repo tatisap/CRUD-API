@@ -2,43 +2,27 @@ import { IncomingMessage } from "http";
 import { URL } from "url";
 import { Answer, Person } from "./interfaces";
 
-class ErrorAnswer implements Answer {
-  _status: string;
-  _message: string;
-  constructor(status: string, message: string) {
+export class ServerAnswer implements Answer {
+  private _status: number;
+  private _body: string | Person | Person[] | null;
+  constructor(status: number, body: string | Person | Person[] | null) {
     this._status = status;
-    this._message = message;
+    this._body = body;
   }
-  get status(): string {
+  get status(): number {
     return this._status;
   }
-  get message(): string {
-    return this._message;
+  get body(): string | Person | Person[] | null {
+    return this._body;
   }
 }
 
-class PositiveAnswer implements Answer {
-  _status: string;
-  _message: string;
-  _data: Person | Person[];
-  constructor(status: string, message: string, data: Person | Person[]) {
-    this._status = status;
-    this._message = message;
-    this._data = data;
-  }
-  get status(): string {
-    return this._status;
-  }
-  get message(): string {
-    return this._message;
-  }
-  get data(): Person | Person[] {
-    return this._data;
-  }
-}
+const route = '/api/users';
 
 export const processRequest = (req: IncomingMessage): Answer => {
-  if (req.url === undefined) return new ErrorAnswer('', '');
+  if (req.url === undefined) return new ServerAnswer(404, 'Not found');
   const url: URL = new URL(req.url, `http://${req.headers.host}`);
-  return new PositiveAnswer('', '', '');
+  if (!url.pathname.startsWith(route)) return new ServerAnswer (404, 'Not found');
+  const id: string = url.pathname.slice(route.length);
+  return new ServerAnswer(404, '');
 }
