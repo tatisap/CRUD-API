@@ -1,10 +1,10 @@
 import { IncomingMessage } from "http";
 import { URL } from "url";
-import { Answer, Method, Person } from "./interfaces";
-import { get } from "./methods/get";
-import { post } from "./methods/post";
-import { put } from "./methods/put";
-import { del } from "./methods/delete";
+import { Answer, Person } from "./interfaces";
+import { get } from "./methods/get.js";
+import { post } from "./methods/post.js";
+import { put } from "./methods/put.js";
+import { del } from "./methods/delete.js";
 
 export class ServerAnswer implements Answer {
   private _status: number;
@@ -30,10 +30,11 @@ export class RequestProcessor {
     const url: URL = new URL(req.url, `http://${req.headers.host}`);
     if (!url.pathname.startsWith(route)) return new ServerAnswer (404, 'Resource that you requested does not exist');
 
-    const id: string = url.pathname.slice(route.length); 
-    const body: string= await this.getBody(req);
+    const id: string = url.pathname.slice(route.length + 1); 
+    const body: string = await this.getBody(req);
+    const contentType: string | undefined = (req.headers['content-type']);
 
-    return this.processRequest(req.method, id, body);
+    return this.processRequest(req.method, id, body, contentType);
   }
 
   private async getBody(req: IncomingMessage): Promise<string> {
@@ -45,16 +46,16 @@ export class RequestProcessor {
     });
   }
   
-  private processRequest(method: string | undefined, id: string, body: string): Answer {
+  private processRequest(method: string | undefined, id: string, body: string, contentType: string | undefined): Answer {
     switch (method) {
       case 'GET':
         return this.runGetMethod(id);
         break;
       case 'POST':
-        return this.runPostMethod(body);
+        return this.runPostMethod(id, body, contentType);
         break;
       case 'PUT':
-        return this.runPutMethod(id, body);
+        return this.runPutMethod(id, body, contentType);
         break;
       case 'DELETE':
         return this.runDeleteMethod(id);
@@ -68,8 +69,8 @@ export class RequestProcessor {
     return new ServerAnswer(404, 'Method you are trying to execute is not found');
   }
 
-  private runGetMethod: Method = get;
-  private runPostMethod: Method = post;
-  private runPutMethod: Method = put;
-  private runDeleteMethod: Method = del;
+  private runGetMethod = get;
+  private runPostMethod = post;
+  private runPutMethod = put;
+  private runDeleteMethod = del;
 }
