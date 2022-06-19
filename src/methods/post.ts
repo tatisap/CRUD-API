@@ -10,8 +10,6 @@ export const post = (id: string, body: string, contentType: string | undefined):
 
   if (contentType !== 'application/json') return new ServerAnswer(400, 'Content format is not JSON');
   const {username, age, hobbies} = JSON.parse(body) as Person;
-  console.log(body);
-  console.log([username, age, hobbies].filter(key => key === undefined));
   if([username, age, hobbies].filter(key => key === undefined).length) return new ServerAnswer(400, 'You did not send required information');
 
   const userId: string = v4();

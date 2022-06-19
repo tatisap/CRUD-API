@@ -1,5 +1,5 @@
 export interface Person {
-  id: string;
+  id?: string;
   username: string;
   age: number;
   hobbies: string[];
@@ -11,5 +11,5 @@ export interface Answer {
 }
 
 export interface Method {
-  (id: string): Answer
+  (id?: string, body?: string): Answer;
 }
