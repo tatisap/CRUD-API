@@ -24,3 +24,4 @@ export const server: Server = http.createServer(async (req: IncomingMessage, res
 });
 
 server.listen(4000);
+console.log('Server started on port 4000');
